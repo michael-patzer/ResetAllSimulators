@@ -103,5 +103,4 @@ end enable_UI_elements
 
 -- main()
 
-enable_UI_elements()
 reset_all_simulators()
