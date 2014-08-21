@@ -108,10 +108,13 @@ end reset_all_simulators
 
 on enable_UI_elements()
 	tell application "System Events"
-		set UI elements enabled to true
+		try
+			set UI elements enabled to true
+		end try
 	end tell
 end enable_UI_elements
 
 -- main()
 
+enable_UI_elements()
 reset_all_simulators()
