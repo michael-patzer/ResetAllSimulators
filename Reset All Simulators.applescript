@@ -16,7 +16,7 @@ on menu_click(mList)
 	
 	-- This overly-long line calls the menu_recurse function with
 	-- two arguments: r, and a reference to the top-level menu
-	tell application "System Events" to my menu_click_recurse(r, ((process appName)'s Â
+	tell application "System Events" to my menu_click_recurse(r, ((process appName)'s ¬
 		(menu bar 1)'s (menu bar item topMenu)'s (menu topMenu)))
 end menu_click
 
@@ -37,13 +37,15 @@ on menu_click_recurse(mList, parentObject)
 	end tell
 end menu_click_recurse
 
--- `reset_simulator`, by Stian Gudmundsen H¿iland, March 2013
+-- `reset_simulator`, by Stian Gudmundsen Høiland, March 2013
 
 on reset_simulator()
-	menu_click({"iOS Simulator", "iOS Simulator", "Reset Content and SettingsÉ"})
+	menu_click({"iOS Simulator", "iOS Simulator", "Reset Content and Settings…"})
 	
 	tell application "System Events"
 		tell process "iOS Simulator"
+			delay 0.8
+			
 			tell window 1
 				click button "Reset"
 			end tell
@@ -51,7 +53,7 @@ on reset_simulator()
 	end tell
 end reset_simulator
 
--- 'reset_all_simulators' by Michael Patzer, October 2013, based on Stian Gudmundsen H¿iland's "The-Definitive-iOS-Simulator-Reset-Script"
+-- 'reset_all_simulators' by Michael Patzer, October 2013, based on Stian Gudmundsen Høiland's "The-Definitive-iOS-Simulator-Reset-Script"
 -- 
 -- Resets all versions and devices of iOS Simulator
 
@@ -108,9 +110,28 @@ end reset_all_simulators
 
 on enable_UI_elements()
 	tell application "System Events"
-		try
-			set UI elements enabled to true
-		end try
+		set textButtonCancel to "Cancel"
+		set textButtonOkay to "Okay"
+
+		-- this continues loop until UI elements are enabled, or user presses cancel
+		repeat while (UI elements enabled) is false
+		
+			-- alert the user
+			display dialog "In order to reset your simulators automatically, this script needs your permission to control your computer's interface." & return & return & "Press okay to continue or press cancel to disallow this and to quit this script." buttons {textButtonCancel, textButtonOkay} default button textButtonOkay cancel button textButtonCancel with title "Allow Accessibility?"
+		
+			--get a reference to the Security & Privacy preferences pane
+	    set securityPane to pane id "com.apple.preference.security"
+
+	    --tell that pane to navigate to its "Accessibility" section under its Privacy tab
+		  --(the anchor name is arbitrary and does not imply a meaningful hierarchy.)
+ 			tell securityPane to reveal anchor "Privacy_Accessibility"
+
+	    --open the preferences window and make it frontmost
+	    activate
+		
+			-- instruct user how to enable UI elements
+			display dialog "Opening Security & Privacy pane of System Preferences." & return & return & "Please add AppleScript Editor to the 'Allow the apps below to control your computer' list, and ensure it's checked." buttons {textButtonCancel, textButtonOkay} default button textButtonOkay cancel button textButtonCancel with title "Enable Accessibility"
+		end repeat
 	end tell
 end enable_UI_elements
 
